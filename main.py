@@ -13,7 +13,6 @@ class Enemy:
     def draw(self, surface):
         gfxdraw.filled_circle(surface, self.x, self.y, self.radius, black)
         gfxdraw.aacircle(surface, self.x, self.y, self.radius, black)
-        
         text = font.render(self.word, True, black)
         screen.blit(text,(self.x, self.y - 100))
 
@@ -41,12 +40,13 @@ user_text = ''
 
 screen = pg.display.set_mode(resolution)
 
-enemy = Enemy(resolution[0]/2, resolution[1]/2, wordlist)
+enemyList = [Enemy(resolution[0]/2, resolution[1]/2, wordlist), Enemy(resolution[0]/3, resolution[1]/3, wordlist)]
 
 while True:
     screen.fill(white)
 
-    enemy.draw(screen)
+    list(map(lambda x: x.draw(screen), enemyList))
+    #enemy.draw(screen)
     
     pg.display.flip()
     
@@ -58,7 +58,7 @@ while True:
             if event.key == pg.K_SPACE:
                 user_text = user_text[:-1]
                 print((user_text))
-                enemy.elim(user_text)
+                list(map(lambda x: x.elim(user_text), enemyList))
         if event.type == pg.QUIT:
             pg.quit()
 

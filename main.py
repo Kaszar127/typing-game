@@ -1,6 +1,13 @@
 import pygame as pg
 from pygame import gfxdraw
 import random
+import os.path
+
+resolution = (700,400)
+white = pg.Color(255,255,255)
+black = pg.Color(0,0,0)
+user_text = ''
+my_path = os.path.abspath(os.path.dirname(__file__))
 
 class Enemy:
     def __init__(self, xPos, yPos, words, rad = 15):
@@ -18,25 +25,21 @@ class Enemy:
 
     def elim(self, user_text):
         if self.word == user_text:
-            print("banan")
-
+           return True
+        return False
+        
 # Makes wordlist.txt into an actual list
-wordfile = open("Assets/wordlist.txt", "r")
+wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
 worddata = wordfile.read()
 wordlist = worddata.split("\n")
 wordfile.close()
 
 pg.init()
 
-font = pg.font.Font('Assets/Roboto-Black.ttf',18)
+font = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),18)
 
 pg.display.set_caption("Type or DIE")
-pg.display.set_icon(pg.image.load("Assets/typing.jpg"))
-
-resolution = (700,400)
-white = pg.Color(255,255,255)
-black = pg.Color(0,0,0)
-user_text = ''
+pg.display.set_icon(pg.image.load(os.path.join(my_path,"Assets/typing.jpg")))
 
 screen = pg.display.set_mode(resolution)
 
@@ -44,10 +47,7 @@ enemyList = [Enemy(resolution[0]/2, resolution[1]/2, wordlist), Enemy(resolution
 
 while True:
     screen.fill(white)
-
     list(map(lambda x: x.draw(screen), enemyList))
-    #enemy.draw(screen)
-    
     pg.display.flip()
     
     for event in pg.event.get():
@@ -58,7 +58,18 @@ while True:
             if event.key == pg.K_SPACE:
                 user_text = user_text[:-1]
                 print((user_text))
-                list(map(lambda x: x.elim(user_text), enemyList))
+
+                # Created to avoide overunning enemyList while reffering to the last element
+                indexList = []
+                for i in range(len(enemyList)):
+                    if(enemyList[i].elim(user_text)):
+                        indexList.append(i)
+                for j in range(len(indexList)):
+                    enemyList.pop(indexList[j])
+
+                # Kept for future refference
+                # list(map(lambda x: x.elim(user_text), enemyList))
+
         if event.type == pg.QUIT:
             pg.quit()
 

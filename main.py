@@ -6,7 +6,7 @@ import os.path
 resolution = (700,400)
 white = pg.Color(255,255,255)
 black = pg.Color(0,0,0)
-user_text = ''
+user_text = ""
 my_path = os.path.abspath(os.path.dirname(__file__))
 
 class Enemy:
@@ -24,10 +24,10 @@ class Enemy:
         screen.blit(text,(self.x, self.y - 100))
 
     def elim(self, user_text):
-        if self.word == user_text:
+        if(self.word == user_text):
            return True
         return False
-        
+
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
 worddata = wordfile.read()
@@ -58,7 +58,7 @@ while True:
             if event.key == pg.K_SPACE:
                 user_text = user_text[:-1]
                 print((user_text))
-
+                
                 # Created to avoide overunning enemyList while reffering to the last element
                 indexList = []
                 for i in range(len(enemyList)):
@@ -66,6 +66,8 @@ while True:
                         indexList.append(i)
                 for j in range(len(indexList)):
                     enemyList.pop(indexList[j])
+
+                user_text = ""
 
                 # Kept for future refference
                 # list(map(lambda x: x.elim(user_text), enemyList))

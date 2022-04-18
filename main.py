@@ -19,7 +19,14 @@ class Enemy:
         self.radius = rad
         self.word = random.choice(words)
 
+        # Speed cant be less because the integer conversion rounding causes a (maybe) endless loop
+        self.speed = 0.01
+        self.vector = pg.Vector2(int(resolution[0]/2)-self.x,int(resolution[1]/2)-self.y)
+        
+
     def draw(self, surface):
+        print(self.x)
+        print(self.y)
         gfxdraw.filled_circle(surface, self.x, self.y, self.radius, black)
         gfxdraw.aacircle(surface, self.x, self.y, self.radius, black)
         text = font.render(self.word, True, black)
@@ -29,6 +36,10 @@ class Enemy:
         if(self.word == user_text):
            return True
         return False
+
+    def move(self):
+        self.x += int(self.vector[0] * self.speed)
+        self.y += int(self.vector[1] * self.speed)
 
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
@@ -54,18 +65,21 @@ while True:
     # For visulisation will remove
     gfxdraw.aacircle(screen,int(resolution[0]/2),int(resolution[1]/2),int(resolution[0]/2), black)
 
+    # THIS NEEDS TO BE RUN LESS OFTEN FIX FIX FIX
+    list(map(lambda x: x.move(),enemyList))
+
     pg.display.flip()
     
     for event in pg.event.get():
-        if event.type == pg.KEYDOWN:
+        if(event.type == pg.KEYDOWN):
             user_text += event.unicode
-            if event.key == pg.K_BACKSPACE:
+            if(event.key == pg.K_BACKSPACE):
                 user_text = user_text[:-2]
-            if event.key == pg.K_SPACE:
+            if(event.key == pg.K_SPACE):
                 user_text = user_text[:-1]
                 print((user_text))
-                
-                # Created to avoide overunning enemyList while reffering to the last element
+
+                # Created to avoid overunning enemyList while reffering to the last element
                 indexList = []
                 for i in range(len(enemyList)):
                     if(enemyList[i].elim(user_text)):
@@ -78,7 +92,7 @@ while True:
                 # Kept for future refference
                 # list(map(lambda x: x.elim(user_text), enemyList))
 
-        if event.type == pg.QUIT:
+        if(event.type == pg.QUIT):
             pg.quit()
 
 #    for char in range(len(user_text)):

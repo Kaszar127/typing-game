@@ -28,11 +28,9 @@ class Enemy:
         self.word = random.choice(words)
         self.speed = 5
         
-        # Speed cant be less because the integer conversion rounding causes a (maybe) endless loop
-        
     def draw(self):
         gfxdraw.filled_circle(self.surface, int(self.position.x), int(self.position.y), self.radius, red)
-        gfxdraw.aacircle(self.surface, int(self.position.x), int(self.position.y), self.radius, black)
+        gfxdraw.aacircle(self.surface, int(self.position.x), int(self.position.y), self.radius, red)
         text = font.render(self.word, True, black)
         screen.blit(text,(self.position.x, self.position.y - self.surface.get_height()/10))
 

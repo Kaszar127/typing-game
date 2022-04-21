@@ -3,31 +3,41 @@ from pygame import gfxdraw
 import math
 import random
 import os.path
+import time
 
 resolution = [700,700]
 white = pg.Color(255,255,255)
+red = pg.Color(255,0,0)
 black = pg.Color(0,0,0)
 user_text = ""
 my_path = os.path.abspath(os.path.dirname(__file__))
 
+# deltaTime
+prev_time = time.time()
+deltaTime = 0
+timer = 0
+enemyTimer = 0
+
 class Enemy:
-    def __init__(self, xPos, yPos, words, rad = 15):
+    def __init__(self, words, rad = 15):
         self.randomVar = random.randint(0,360)
         self.spawnRad = int(resolution[0]/2)
         self.x = int(resolution[0]/2 + self.spawnRad * math.cos(self.randomVar * math.pi / 180))
         self.y = int(resolution[1]/2 + self.spawnRad * math.sin(self.randomVar * math.pi / 180))
         self.radius = rad
         self.word = random.choice(words)
-
-        # Speed cant be less because the integer conversion rounding causes a (maybe) endless loop
-        self.speed = 0.01
-        self.vector = pg.Vector2(int(resolution[0]/2)-self.x,int(resolution[1]/2)-self.y)
         
+        # Speed cant be less because the integer conversion rounding causes a (maybe) endless loop
+        self.speed = 0.005
+        self.vector = pg.Vector2(int(resolution[0]/2)-self.x,int(resolution[1]/2)-self.y)
 
+        self.moveX = int(self.vector[0] * self.speed)
+        self.moveY = int(self.vector[1] * self.speed)
+        
     def draw(self, surface):
         print(self.x)
         print(self.y)
-        gfxdraw.filled_circle(surface, self.x, self.y, self.radius, black)
+        gfxdraw.filled_circle(surface, self.x, self.y, self.radius, red)
         gfxdraw.aacircle(surface, self.x, self.y, self.radius, black)
         text = font.render(self.word, True, black)
         screen.blit(text,(self.x, self.y - resolution[1]/10))
@@ -38,8 +48,8 @@ class Enemy:
         return False
 
     def move(self):
-        self.x += int(self.vector[0] * self.speed)
-        self.y += int(self.vector[1] * self.speed)
+        self.x += self.moveX
+        self.y += self.moveY
 
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
@@ -56,20 +66,33 @@ pg.display.set_icon(pg.image.load(os.path.join(my_path,"Assets/typing.jpg")))
 
 screen = pg.display.set_mode(resolution)
 
-enemyList = [Enemy(resolution[0]/2, resolution[1]/2, wordlist), Enemy(resolution[0]/3, resolution[1]/3, wordlist)]
+enemyList = []
 
 while True:
+    # deltaTime
+    nowTime = time.time()
+    deltaTime = nowTime - prev_time
+    prev_time = nowTime
+    timer += deltaTime
+    enemyTimer += deltaTime
+
     screen.fill(white)
     list(map(lambda x: x.draw(screen), enemyList))
 
+    if(timer >= 0.01):
+        list(map(lambda x: x.move(),enemyList))
+        timer = 0
+
+    if(enemyTimer >= 2):
+        enemyList.append(Enemy(wordlist))
+        enemyTimer = 0
+
     # For visulisation will remove
     gfxdraw.aacircle(screen,int(resolution[0]/2),int(resolution[1]/2),int(resolution[0]/2), black)
-
-    # THIS NEEDS TO BE RUN LESS OFTEN FIX FIX FIX
-    list(map(lambda x: x.move(),enemyList))
-
-    pg.display.flip()
+    gfxdraw.aacircle(screen,int(resolution[0]/2),int(resolution[1]/2),15, black)
     
+    pg.display.flip()
+
     for event in pg.event.get():
         if(event.type == pg.KEYDOWN):
             user_text += event.unicode
@@ -78,7 +101,7 @@ while True:
             if(event.key == pg.K_SPACE):
                 user_text = user_text[:-1]
                 print((user_text))
-
+                
                 # Created to avoid overunning enemyList while reffering to the last element
                 indexList = []
                 for i in range(len(enemyList)):
@@ -86,12 +109,8 @@ while True:
                         indexList.append(i)
                 for j in range(len(indexList)):
                     enemyList.pop(indexList[j])
-
+                
                 user_text = ""
-
-                # Kept for future refference
-                # list(map(lambda x: x.elim(user_text), enemyList))
-
         if(event.type == pg.QUIT):
             pg.quit()
 

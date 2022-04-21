@@ -19,28 +19,22 @@ timer = 0
 enemyTimer = 0
 
 class Enemy:
-    def __init__(self, words, rad = 15):
+    def __init__(self, surface, words, rad = 15):
+        self.surface = surface
         self.randomVar = random.randint(0,360)
-        self.spawnRad = int(resolution[0]/2)
-        self.x = int(resolution[0]/2 + self.spawnRad * math.cos(self.randomVar * math.pi / 180))
-        self.y = int(resolution[1]/2 + self.spawnRad * math.sin(self.randomVar * math.pi / 180))
+        self.spawnRad = int(self.surface.get_width()/2)
+        self.position = pg.Vector2(int(self.surface.get_width()/2 + self.spawnRad * math.cos(self.randomVar * math.pi / 180)), int(self.surface.get_height()/2 + self.spawnRad * math.sin(self.randomVar * math.pi / 180)))
         self.radius = rad
         self.word = random.choice(words)
+        self.speed = 5
         
         # Speed cant be less because the integer conversion rounding causes a (maybe) endless loop
-        self.speed = 0.005
-        self.vector = pg.Vector2(int(resolution[0]/2)-self.x,int(resolution[1]/2)-self.y)
-
-        self.moveX = int(self.vector[0] * self.speed)
-        self.moveY = int(self.vector[1] * self.speed)
         
-    def draw(self, surface):
-        print(self.x)
-        print(self.y)
-        gfxdraw.filled_circle(surface, self.x, self.y, self.radius, red)
-        gfxdraw.aacircle(surface, self.x, self.y, self.radius, black)
+    def draw(self):
+        gfxdraw.filled_circle(self.surface, int(self.position.x), int(self.position.y), self.radius, red)
+        gfxdraw.aacircle(self.surface, int(self.position.x), int(self.position.y), self.radius, black)
         text = font.render(self.word, True, black)
-        screen.blit(text,(self.x, self.y - resolution[1]/10))
+        screen.blit(text,(self.position.x, self.position.y - self.surface.get_height()/10))
 
     def elim(self, user_text):
         if(self.word == user_text):
@@ -48,8 +42,15 @@ class Enemy:
         return False
 
     def move(self):
-        self.x += self.moveX
-        self.y += self.moveY
+
+        try:
+            self.target = (pg.Vector2(self.surface.get_size())/2 - self.position).normalize()
+        except:
+            pass
+
+        self.velocity = pg.Vector2(self.target.x * self.speed, self.target.y * self.speed)
+        self.position += self.velocity
+
 
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
@@ -77,19 +78,19 @@ while True:
     enemyTimer += deltaTime
 
     screen.fill(white)
-    list(map(lambda x: x.draw(screen), enemyList))
+    list(map(lambda x: x.draw(), enemyList))
 
     if(timer >= 0.01):
         list(map(lambda x: x.move(),enemyList))
         timer = 0
 
     if(enemyTimer >= 2):
-        enemyList.append(Enemy(wordlist))
+        enemyList.append(Enemy(screen, wordlist))
         enemyTimer = 0
 
     # For visulisation will remove
-    gfxdraw.aacircle(screen,int(resolution[0]/2),int(resolution[1]/2),int(resolution[0]/2), black)
-    gfxdraw.aacircle(screen,int(resolution[0]/2),int(resolution[1]/2),15, black)
+    gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),int(resolution[0]/2), black)
+    gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),15, black)
     
     pg.display.flip()
 

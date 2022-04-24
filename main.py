@@ -5,21 +5,6 @@ import random
 import os.path
 import time
 
-# Various variables
-resolution = [1000,1000]
-user_text = ""
-my_path = os.path.abspath(os.path.dirname(__file__))
-score = 0
-userRadius = 15
-enemyList = []
-playing = True
-
-# deltaTime
-prev_time = time.time()
-deltaTime = 0
-timer = 0
-enemyTimer = 0
-
 # Enemy class
 class Enemy:
     def __init__(self, surface, words,):
@@ -66,6 +51,21 @@ class Enemy:
            self.position.y <= screen.get_height()/2 + screen.get_height()/20):
             return False
         return True
+
+# Various variables
+resolution = [1000,1000]
+user_text = ""
+my_path = os.path.abspath(os.path.dirname(__file__))
+score = 0
+userRadius = 15
+enemyList = []
+playing = True
+
+# deltaTime
+prev_time = time.time()
+deltaTime = 0
+timer = 0
+enemyTimer = 0
 
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
@@ -118,7 +118,6 @@ while True:
             for i in range(len(enemyList)):
                 if (enemyList[i].move() != True):
                     playing=False
-
             timer = 0
 
         # Generates enemy based on deltatime

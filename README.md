@@ -1,3 +1,2 @@
-# typing-game
+# Word Wizard (typing game)
 
-possible titles: Type or DIE, Word Sorcerer, Typing Game

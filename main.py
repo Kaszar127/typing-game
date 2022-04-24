@@ -5,16 +5,14 @@ import random
 import os.path
 import time
 
+# Various variables
 resolution = [1000,1000]
-white = pg.Color(255,255,255)
-red = pg.Color(255,0,0)
-black = pg.Color(0,0,0)
 user_text = ""
 my_path = os.path.abspath(os.path.dirname(__file__))
 score = 0
-fontSize = 22
 userRadius = 15
 enemyList = []
+playing = True
 
 # deltaTime
 prev_time = time.time()
@@ -22,6 +20,7 @@ deltaTime = 0
 timer = 0
 enemyTimer = 0
 
+# Enemy class
 class Enemy:
     def __init__(self, surface, words,):
         self.surface = surface
@@ -29,27 +28,25 @@ class Enemy:
         self.spawnRad = int(self.surface.get_width()/2)
         self.position = pg.Vector2(int(self.surface.get_width()/2 + self.spawnRad * math.cos(self.randomVar * math.pi / 180)), int(self.surface.get_height()/2 + self.spawnRad * math.sin(self.randomVar * math.pi / 180)))
         self.radius = 15
+        self.fontSize = 22
         self.word = random.choice(words)
         self.speed = 1
         
     def draw(self):
-        #gfxdraw.filled_circle(self.surface, int(self.position.x), int(self.position.y), self.radius, red)
-        #gfxdraw.aacircle(self.surface, int(self.position.x), int(self.position.y), self.radius, red)
+        #gfxdraw.filled_circle(self.surface, int(self.position.x), int(self.position.y), self.radius, pg.Color(255,0,0))
+        #gfxdraw.aacircle(self.surface, int(self.position.x), int(self.position.y), self.radius, pg.Color(255,0,0))
         
-        screen.blit(font.render(self.word, True, black),(self.position.x - self.radius/2 - (fontSize*len(self.word)/5), self.position.y - (userRadius*3) - (fontSize/2)))
+        # Displays enemy word
+        screen.blit(font1.render(self.word, True, pg.Color(255,0,0)),(self.position.x - self.radius/2 - (self.fontSize*len(self.word)/5), self.position.y - (userRadius*3) - (self.fontSize/2)))
 
+        # Displays enemy sprite depending on left-right direction
         if(self.position.x >= self.surface.get_width()/2):
             screen.blit(slimeSpriteFlipped,(self.position.x - screen.get_width()/30, self.position.y - screen.get_height()/30))
         else:
             screen.blit(slimeSprite,(self.position.x - screen.get_width()/30, self.position.y - screen.get_height()/30))
 
-
     def elim(self, user_text):
         if(self.word == user_text):
-            # Still need fix
-            #limAni = font.render(str(len(self.word*10)), True, black)
-            #screen.blit(elimAni,(self.position.x, self.position.y))
-            
             return True, 
         return False
 
@@ -68,11 +65,12 @@ worddata = wordfile.read()
 wordlist = worddata.split("\n")
 wordfile.close()
 
+# Initializes pygame and sets display size and fonts
 pg.init()
-
 screen = pg.display.set_mode(resolution)
-
-font = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),fontSize)
+font1 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),22)
+font2 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),36)
+font3 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),96)
 
 # Image load
 wizardLoad = pg.image.load(os.path.join(my_path,"Assets/wizard.png"))
@@ -85,65 +83,95 @@ slimeSprite = pg.transform.scale(slimeLoad, (screen.get_width()/15, screen.get_h
 slimeSpriteFlipped = pg.transform.flip(slimeSprite.copy(),True, False)
 grassSprite = pg.transform.scale(grassLoad, (screen.get_width(),screen.get_height()))
 
+# Sets caption and img of display
 pg.display.set_caption("Word Wizard")
 pg.display.set_icon(pg.image.load(os.path.join(my_path,"Assets/wizard.png")))
 
+# Main game loop
 while True:
-    # deltaTime
-    nowTime = time.time()
-    deltaTime = nowTime - prev_time
-    prev_time = nowTime
-    timer += deltaTime
-    enemyTimer += deltaTime
+    # Sub game loop
+    while playing:
+        # deltaTime
+        nowTime = time.time()
+        deltaTime = nowTime - prev_time
+        prev_time = nowTime
+        timer += deltaTime
+        enemyTimer += deltaTime
 
-    # Image display
-    screen.blit(grassSprite,(0, 0))
-    screen.blit(wizardSprite,(screen.get_width()/2-screen.get_width()/20, screen.get_height()/2-screen.get_height()/20))
+        # Image display
+        screen.blit(grassSprite,(0, 0))
+        screen.blit(wizardSprite,(screen.get_width()/2-screen.get_width()/20, screen.get_height()/2-screen.get_height()/20))
     
-    # Calls enemy draw method
-    list(map(lambda x: x.draw(), enemyList))
+        # Calls enemy draw method
+        list(map(lambda x: x.draw(), enemyList))
 
-    # Calls enemy move method based on deltatime
-    if(timer >= 0.01):
-        list(map(lambda x: x.move(),enemyList))
-        timer = 0
+        # Calls enemy move method based on deltatime
+        if(timer >= 0.01):
+            list(map(lambda x: x.move(),enemyList))
+            timer = 0
 
-    # Generates enemy based on deltatime
-    if(enemyTimer >= 2):
-        enemyList.append(Enemy(screen, wordlist))
-        enemyTimer = 0
+        # Generates enemy based on deltatime
+        if(enemyTimer >= 2):
+            enemyList.append(Enemy(screen, wordlist))
+            enemyTimer = 0
 
-    # For visulisation will remove
-    #gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),int(resolution[0]/2),black)
-    #gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),userRadius,black)
+        # For visulisation will remove
+        # gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),int(resolution[0]/2),pg.Color(0,0,0))
+        # gfxdraw.aacircle(screen,int(screen.get_width()/2),int(screen.get_height()/2),userRadius,pg.Color(0,0,0))
 
-    screen.blit(font.render("Score: " + str(score), True, black),(screen.get_width()/2 - (fontSize*(len("Score: ")+len(str(score)))/5), fontSize))
-    screen.blit(font.render(user_text, True, black),(screen.get_width()/2 - (userRadius/2) - (fontSize*len(user_text)/5), screen.get_height()/2 - (userRadius*5) - (fontSize/2)))
+        # Displays score and user input
+        screen.blit(font2.render("Score: " + str(score), True, pg.Color(0,0,0)),(screen.get_width()/2 - (36*(len("Score: ")+len(str(score)))/5), 36))
+        screen.blit(font1.render(user_text, True, pg.Color(0,0,0)),(screen.get_width()/2 - (userRadius/2) - (22*len(user_text)/5), screen.get_height()/2 - (userRadius*5) - (22/2)))
     
-    pg.display.flip()
+        # Refreshes display
+        pg.display.flip()
 
-    for event in pg.event.get():
-        if(event.type == pg.KEYDOWN):
-            user_text += event.unicode
-            if(event.key == pg.K_BACKSPACE):
-                user_text = user_text[:-2]
-            if(event.key == pg.K_SPACE):
-                user_text = user_text[:-1]
-                print((user_text))
+        # Main event loop
+        for event in pg.event.get():
+            if(event.type == pg.KEYDOWN):
+                user_text += event.unicode
+                if(event.key == pg.K_1):
+                    playing = False
+                if(event.key == pg.K_BACKSPACE):
+                    user_text = user_text[:-2]
+                if(event.key == pg.K_SPACE):
+                    user_text = user_text[:-1]
                 
-                # Created to avoid overunning enemyList while reffering to the last element
-                indexList = []
-                for i in range(len(enemyList)):
-                    if(enemyList[i].elim(user_text)):
-                        indexList.append(i)
-                        score += len(user_text)*10
-                for j in range(len(indexList)):
-                    enemyList.pop(indexList[j])
+                    # Created to avoid overunning enemyList while reffering to the last element
+                    indexList = []
+                    for i in range(len(enemyList)):
+                        if(enemyList[i].elim(user_text)):
+                            indexList.append(i)
+                            score += len(user_text)*10
+                    for j in range(len(indexList)):
+                        enemyList.pop(indexList[j])
                 
-                user_text = ""
-        if(event.type == pg.QUIT):
-            pg.quit()
+                    user_text = ""
+            if(event.type == pg.QUIT):
+                pg.quit()
+    
+    # Game over loop
+    while not playing:
+        # Game over screen background
+        screen.fill(pg.Color(0, 0, 0))
 
-#    for char in range(len(user_text)):
-#       if user_text[char] == enemy.word:
-#          print(user_text[char])
+        # Game over screen text
+        screen.blit(font3.render("Game Over", True, pg.Color(255, 0, 0)), (screen.get_width()/2 - (96*(len("Game Over")/4)), screen.get_height()/4))
+        screen.blit(font2.render("A Tragic End", True, pg.Color(255, 255, 255)), (screen.get_width()/2 - (36*(len("A Tragic End")/4.3)), screen.get_height()/2-(36*1.5)))
+        screen.blit(font1.render("The casting speed of the wizard could not keep up with the appearance of slimes.", True, pg.Color(255, 255, 255)), (screen.get_width()/2 - (22*(len("The casting speed of the wizard could not keep up with the appearance of slimes.")/4.3)), screen.get_height()/2))
+        screen.blit(font1.render("Still, The wizard put up a valiant front before succumbing to the unending horde of slimes.", True, pg.Color(255, 255, 255)), (screen.get_width()/2 - (22*(len("Still, The wizard put up a valiant front before succumbing to the unending horde of slimes.")/4.3)), screen.get_height()/2+(22*1.5)))
+        screen.blit(font1.render("Thereby, achieving a score of " + str(score) + " for future wizards to beat.", True, pg.Color(255, 255, 255)), (screen.get_width()/2 - (22*((len("Thereby, achieving a score of ")+len(str(score))+len(" for future wizards to beat."))/4.3)), screen.get_height()/2+(22*1.5*2)))
+        screen.blit(font2.render("Press ENTER for a subsequent attempt. . .", True, pg.Color(255, 255, 255)), (screen.get_width()/2 - (36*(len("Press ENTER for a subsequent attempt. . .")/4.3)), screen.get_height()/1.5))
+        
+        # Game over screen refresh
+        pg.display.flip()
+
+        # Game over screen event loop
+        for event in pg.event.get():
+            if(event.type == pg.KEYDOWN):
+                if(event.key == pg.K_RETURN):
+                    score = 0
+                    enemyList = []
+                    playing = True
+            if(event.type == pg.QUIT):
+                pg.quit()

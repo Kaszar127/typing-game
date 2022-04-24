@@ -59,6 +59,14 @@ class Enemy:
         self.velocity = pg.Vector2(self.target.x * self.speed, self.target.y * self.speed)
         self.position += self.velocity
 
+        # Checks if enemy hits player
+        if(self.position.x >= screen.get_width()/2 - screen.get_width()/20 and 
+           self.position.x <= screen.get_width()/2 + screen.get_width()/20 and 
+           self.position.y >= screen.get_height()/2 - screen.get_height()/20 and 
+           self.position.y <= screen.get_height()/2 + screen.get_height()/20):
+            return False
+        return True
+
 # Makes wordlist.txt into an actual list
 wordfile = open(os.path.join(my_path,"Assets/wordlist.txt"), "r")
 worddata = wordfile.read()
@@ -107,7 +115,10 @@ while True:
 
         # Calls enemy move method based on deltatime
         if(timer >= 0.01):
-            list(map(lambda x: x.move(),enemyList))
+            for i in range(len(enemyList)):
+                if (enemyList[i].move() != True):
+                    playing=False
+
             timer = 0
 
         # Generates enemy based on deltatime
@@ -130,8 +141,6 @@ while True:
         for event in pg.event.get():
             if(event.type == pg.KEYDOWN):
                 user_text += event.unicode
-                if(event.key == pg.K_1):
-                    playing = False
                 if(event.key == pg.K_BACKSPACE):
                     user_text = user_text[:-2]
                 if(event.key == pg.K_SPACE):
@@ -172,6 +181,7 @@ while True:
                 if(event.key == pg.K_RETURN):
                     score = 0
                     enemyList = []
+                    user_text = ""
                     playing = True
             if(event.type == pg.QUIT):
                 pg.quit()

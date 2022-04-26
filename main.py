@@ -13,7 +13,8 @@ class Enemy:
         self.position = pg.Vector2(int(self.surface.get_width()/2 + self.spawnRad * math.cos(self.randomVar * math.pi / 180)), int(self.surface.get_height()/2 + self.spawnRad * math.sin(self.randomVar * math.pi / 180)))
         self.radius = 15
         self.fontSize = 22
-        self.word = random.choice(words)
+        # Will eventually self-destruct because of index out range
+        self.word = words.pop(words.index(random.choice(words)))
         self.speed = 1
         
     def draw(self):

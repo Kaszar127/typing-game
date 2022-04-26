@@ -1,9 +1,8 @@
 import pygame as pg
-from pygame import gfxdraw
 import math
 import random
-import os.path
 import time
+import os.path
 
 # Enemy class
 class Enemy:
@@ -44,13 +43,12 @@ class Enemy:
         self.velocity = pg.Vector2(self.target.x * self.speed, self.target.y * self.speed)
         self.position += self.velocity
 
+    def isColliding(self):
         # Checks if enemy hits player
-        if(self.position.x >= screen.get_width()/2 - screen.get_width()/20 and 
-           self.position.x <= screen.get_width()/2 + screen.get_width()/20 and 
-           self.position.y >= screen.get_height()/2 - screen.get_height()/20 and 
-           self.position.y <= screen.get_height()/2 + screen.get_height()/20):
-            return False
-        return True
+        return (self.position.x >= screen.get_width()/2 - screen.get_width()/20 and 
+            self.position.x <= screen.get_width()/2 + screen.get_width()/20 and 
+            self.position.y >= screen.get_height()/2 - screen.get_height()/20 and 
+            self.position.y <= screen.get_height()/2 + screen.get_height()/20)
 
 # Various variables
 resolution = [1000,1000]
@@ -116,8 +114,10 @@ while True:
         # Calls enemy move method based on deltatime
         if(timer >= 0.01):
             for i in range(len(enemyList)):
-                if (enemyList[i].move() != True):
-                    playing=False
+                enemyList[i].move()
+                if (enemyList[i].isColliding()):
+                    playing = not enemyList[i].isColliding()
+
             timer = 0
 
         # Generates enemy based on deltatime

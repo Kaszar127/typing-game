@@ -51,7 +51,7 @@ class Enemy:
             self.position.y <= screen.get_height()/2 + screen.get_height()/20)
 
 # Various variables
-resolution = [1000,1000]
+resolution = [1000, 1000]
 user_text = ""
 my_path = os.path.abspath(os.path.dirname(__file__))
 score = 0
@@ -73,7 +73,7 @@ wordfile.close()
 
 # Initializes pygame and sets display size and fonts
 pg.init()
-screen = pg.display.set_mode(resolution)
+screen = pg.display.set_mode(resolution, pg.RESIZABLE)
 font1 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),22)
 font2 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),36)
 font3 = pg.font.Font(os.path.join(my_path,"Assets/Roboto-Black.ttf"),96)
@@ -142,7 +142,7 @@ while True:
                 user_text += event.unicode
                 if(event.key == pg.K_BACKSPACE):
                     user_text = user_text[:-2]
-                if(event.key == pg.K_SPACE):
+                if(event.key == pg.K_SPACE or event.key == pg.K_RETURN):
                     user_text = user_text[:-1]
                 
                     # Created to avoid overunning enemyList while reffering to the last element

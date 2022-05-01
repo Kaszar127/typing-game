@@ -1,4 +1,5 @@
 from operator import le
+from turtle import speed
 import pygame as pg
 import math
 import random
@@ -7,7 +8,7 @@ import os.path
 
 # Enemy class
 class Enemy:
-    def __init__(self, surface, words,):
+    def __init__(self, surface, words, speed):
         self.surface = surface
         self.randomVar = random.randint(0,360)
         self.spawnRad = int(self.surface.get_width()/2)
@@ -16,7 +17,7 @@ class Enemy:
         self.fontSize = 22
         # Will eventually self-destruct because of index out range
         self.word = words.pop(words.index(random.choice(words)))
-        self.speed = 1
+        self.enemySpeed = speed
         
     def draw(self):
         #gfxdraw.filled_circle(self.surface, int(self.position.x), int(self.position.y), self.radius, pg.Color(255,0,0))
@@ -42,7 +43,7 @@ class Enemy:
         except:
             pass
 
-        self.velocity = pg.Vector2(self.target.x * self.speed, self.target.y * self.speed)
+        self.velocity = pg.Vector2(self.target.x * self.enemySpeed, self.target.y * self.enemySpeed)
         self.position += self.velocity
 
     def isColliding(self):
@@ -55,6 +56,7 @@ user_text = ""
 my_path = os.path.abspath(os.path.dirname(__file__))
 score = 0
 userRadius = 15
+speed = 1
 enemyList = []
 playing = True
 
@@ -121,7 +123,8 @@ while True:
 
         # Generates enemy based on deltatime
         if(enemyTimer >= 2):
-            enemyList.append(Enemy(screen, wordlist))
+            enemyList.append(Enemy(screen, wordlist, speed))
+            speed += 0.02
             enemyTimer = 0
 
         # For visulisation will remove
@@ -180,6 +183,7 @@ while True:
                     score = 0
                     enemyList = []
                     user_text = ""
+                    speed = 1
                     playing = True
             if(event.type == pg.QUIT):
                 pg.quit()

@@ -1,3 +1,4 @@
+from operator import le
 import pygame as pg
 import math
 import random
@@ -45,11 +46,8 @@ class Enemy:
         self.position += self.velocity
 
     def isColliding(self):
-        # Checks if enemy hits player
-        return (self.position.x >= screen.get_width()/2 - screen.get_width()/20 and 
-            self.position.x <= screen.get_width()/2 + screen.get_width()/20 and 
-            self.position.y >= screen.get_height()/2 - screen.get_height()/20 and 
-            self.position.y <= screen.get_height()/2 + screen.get_height()/20)
+        length = (pg.Vector2(self.surface.get_size())/2 - self.position).length()
+        return (length <= float(self.radius))
 
 # Various variables
 resolution = [1000, 1000]

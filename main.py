@@ -1,5 +1,3 @@
-from operator import le
-from turtle import speed
 import pygame as pg
 import math
 import random
